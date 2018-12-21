@@ -10,43 +10,140 @@ import {
   sPiece,
   zPiece,
   jPiece
-} from "./components/iPiece";
+} from "./components/iPiece.ts";
+import { of } from "rxjs";
 
 const CurrentComponent = BlockLine;
 
 const canvas = document.querySelector("#canvas");
 const tetris = canvas.getContext("2d");
-let xPos = 100;
-let yPos = -100;
-let currentBasePiece = oPiece;
+const bgMusic = document.querySelector('audio');
+
+let currentBasePiece = tPiece;
 let currentPiece = currentBasePiece.one;
+let currentPieceWidth = currentPiece[0].length;
+let currentPieceHeight = currentPiece.length;
+let pieceBlockSize = 25;
 let verticalOffSet = 0;
+
+let xPos = 100;
+let yPos = -currentPieceHeight * 25;
+const gameboardWidth = 400;
+const gameboardHeight = 600;
+
+// figure out a way to check the currentPiece length & height against the pieces current position
+// if it's over the edge and move it back to the edge maybe in setPieceOffset?
+// create checkPieceOffset function to check?
+
+function startGame() {
+  setInterval(() => {
+    tetris.clearRect(0, 0, 400, 600);
+    drawGameboard();
+    drawCurrentPiece(currentPieceHeight);
+    drawCurrentGameState();
+    if (yPos <= 600 - (currentPieceHeight * pieceBlockSize) - pieceBlockSize) {
+      yPos += 25;
+    }
+  }, 300);
+}
+
+function playMusic() {
+  
+  bgMusic.loop = true;
+  bgMusic.volume = 0.5;
+}
+
+function moveCurrentPiece(position, value){
+  switch(position){
+    case 'x':
+      xPos += value;
+      // refreshBoard();
+      break;
+    case 'y':
+      if(value === 600){
+        yPos = 600 - currentPieceHeight * pieceBlockSize;
+      }else{
+        yPos += value;
+      }
+      // refreshBoard();
+      break;
+    default:
+      break;
+  }
+  refreshBoard();
+}
+
+const getUserInput = () => {
+  document.addEventListener("keydown", e => {
+    if (yPos < gameboardHeight - currentPieceHeight * pieceBlockSize) {
+      switch (e.keyCode) {
+        case 37: // left arrow
+          if (xPos >= 25) {
+            moveCurrentPiece('x', -25);
+          }
+          break;
+        case 39: // right arrow
+          if (xPos <= gameboardWidth - currentPieceWidth * 25 - pieceBlockSize) {
+            moveCurrentPiece('x', 25);
+          }
+          break;
+        case 32:
+          moveCurrentPiece('y', 600);
+          break;
+        case 38: // down arrow
+          if (currentBasePiece !== oPiece) {
+            changePieceOrientation();
+          }
+          refreshBoard();
+          break;
+        case 40: 
+          if (yPos <= 600 - 25 - currentPieceHeight * 25) {
+            yPos += 25;
+          } else {
+            yPos = gameBoard - currentPieceHeight * 25;
+          }
+          refreshBoard();
+          break;
+        default:
+          break;
+      }
+    }
+  });
+};
+
+
+function setPieceOffset() {
+  currentPieceWidth = currentPiece[0].length;
+  currentPieceHeight = currentPiece.length;
+  if (xPos > 400) {
+  }
+}
 
 let gameBoard = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 5
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 10
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 15
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 20
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [4, 4, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 4, 0, 0, 0, 0, 0, 0, 0, 0],
-  [3, 4, 5, 5, 5, 5, 0, 0, 0, 0],
-  [3, 3, 1, 1, 2, 2, 0, 0, 0, 0],
-  [0, 3, 1, 1, 2, 2, 0, 0, 0, 0]
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // 24
 ];
 
 function drawCurrentGameState() {
@@ -84,56 +181,23 @@ function drawCurrentGameState() {
   }
 }
 
-const getUserInput = () => {
-  document.addEventListener("keydown", e => {
-    if (yPos < 500) {
-      switch (e.keyCode) {
-        case 37: // left arrow
-          if(xPos >= 25){
-            xPos -= 25;
-            refreshBoard();
-          }
-          break;
-        case 39: // right arrow
-          xPos += 25;
-          refreshBoard();
-          break;
-        case 32:
-          yPos = 500;
-          refreshBoard();
-          break;
-        case 38: // down arrow
-          if (currentBasePiece !== oPiece) {
-            changePieceOrientation();
-          }
-          refreshBoard();
-          break;
-        case 40:
-          if (yPos < 500) {
-            yPos += 25;
-          } else {
-            yPos = 500;
-          }
-          refreshBoard();
-          break;
-      }
-    }
-  });
-};
-
 function changePieceOrientation() {
   switch (currentPiece) {
     case currentBasePiece.one:
       currentPiece = currentBasePiece.two;
+      setPieceOffset();
       break;
     case currentBasePiece.two:
       currentPiece = currentBasePiece.three;
+      setPieceOffset();
       break;
     case currentBasePiece.three:
       currentPiece = currentBasePiece.four;
+      setPieceOffset();
       break;
     case currentBasePiece.four:
       currentPiece = currentBasePiece.one;
+      setPieceOffset();
       break;
     default:
       currentPiece = currentBasePiece.one;
@@ -145,9 +209,7 @@ document.addEventListener("keydown", e => {
   // console.log(e.keyCode);
 });
 
-const bgMusic = document.querySelector("audio");
-bgMusic.loop = true;
-bgMusic.volume = 0.5;
+
 
 function drawGameboard() {
   tetris.fillStyle = "black";
@@ -161,18 +223,10 @@ function refreshBoard() {
   drawCurrentGameState();
 }
 
+startGame();
 getUserInput();
+playMusic();
 
-let start = -100;
-setInterval(() => {
-  tetris.clearRect(0, 0, 400, 600);
-  drawGameboard();
-  drawCurrentPiece(start);
-  drawCurrentGameState();
-  if (yPos < 500) {
-    yPos += 25;
-  }
-}, 300);
 
 function drawCurrentPiece() {
   let xInput = xPos;
@@ -182,14 +236,12 @@ function drawCurrentPiece() {
     for (let j = 0; j < 10; j++) {
       if (currentPiece[i][j]) {
         tetris.fillStyle = currentBasePiece.color;
-        tetris.fillRect(j * 25 + xInput, i * 25 + yInput, 25, 25);
+        tetris.fillRect(j * pieceBlockSize + xInput, i * pieceBlockSize + yInput, pieceBlockSize, pieceBlockSize);
         // tetris.strokeRect(j * 25 + xInput, i * 25 + yInput, 25, 25);
       }
     }
   }
 }
-
-// drawPlayedPieces();
 
 class App extends React.Component {
   state = {
