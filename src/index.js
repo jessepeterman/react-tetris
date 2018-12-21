@@ -11,7 +11,6 @@ import {
   zPiece,
   jPiece
 } from "./components/iPiece.ts";
-import { of } from "rxjs";
 
 const CurrentComponent = BlockLine;
 
@@ -19,7 +18,7 @@ const canvas = document.querySelector("#canvas");
 const tetris = canvas.getContext("2d");
 const bgMusic = document.querySelector('audio');
 
-let currentBasePiece = tPiece;
+let currentBasePiece = jPiece;
 let currentPiece = currentBasePiece.one;
 let currentPieceWidth = currentPiece[0].length;
 let currentPieceHeight = currentPiece.length;
@@ -82,7 +81,7 @@ const getUserInput = () => {
             moveCurrentPiece('x', -25);
           }
           break;
-        case 39: // right arrow
+        case 39: // right arrozzzzw
           if (xPos <= gameboardWidth - currentPieceWidth * 25 - pieceBlockSize) {
             moveCurrentPiece('x', 25);
           }
