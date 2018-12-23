@@ -4,6 +4,7 @@
 // 4 = green
 // 5 - orange
 // 6 - gray
+// 7 - pink
 
 export const iPiece:object = {
   one: [
@@ -117,9 +118,31 @@ export const jPiece: object = {
     [6, 0, 0]
   ],
   four: [
+    [6, 6],
     [0, 6],
-    [0, 6],
-    [6, 6]
+    [0, 6]
   ],
   color: "gray"
+};
+
+export const lPiece: object = {
+  one: [
+    [0, 0, 7],
+    [7, 7, 7]
+  ],
+  two: [
+    [7, 0],
+    [7, 0],
+    [7, 7]
+  ],
+  three: [
+    [7, 7, 7],
+    [7, 0, 0]
+  ],
+  four: [
+    [0, 7],
+    [0, 7],
+    [7, 7]
+  ],
+  color: "pink"
 };
